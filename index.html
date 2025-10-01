@@ -1,39 +1,59 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Projek Gimik AR</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/2.0.0/aframe/build/aframe-ar.js"></script>
-  </head>
-  <body style="margin:0; overflow:hidden;">
-    <a-scene embedded arjs>
-      <!-- Marker HIRO -->
-      <a-marker preset="hiro">
-        <!-- Tajuk Projek -->
-        <a-entity position="0 0.8 0" 
-                  text="value: Projek Gimik Penutup Pertandingan Inovasi; color: red; align: center;">
-        </a-entity>
+<head>
+  <meta charset="utf-8">
+  <title>Projek Gimik AR</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+</head>
+<body style="margin:0; overflow:hidden;">
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled:false;">
+    
+    <!-- Marker HIRO -->
+    <a-marker preset="hiro">
 
-        <!-- Butang Trigger (Hijau) -->
-        <a-box position="0 0 0" depth="0.3" height="0.3" width="0.3" 
-               color="green" onclick="triggerServo()"></a-box>
-        <a-entity position="0 -0.3 0" 
-                  text="value: Trigger; align: center; color: black"></a-entity>
-      </a-marker>
+      <!-- Tajuk Projek -->
+      <a-entity position="0 0.8 0"
+        text="value: Projek Gimik Penutup Pertandingan Inovasi; 
+              color: red; align: center; width: 3;">
+      </a-entity>
 
-      <a-entity camera></a-entity>
-    </a-scene>
+      <!-- Butang Trigger (Kotak Hijau) -->
+      <a-box class="clickable"
+             position="0 0 0"
+             depth="0.3" height="0.3" width="0.3"
+             color="green">
+      </a-box>
 
-    <script>
-      const BLYNK_TOKEN = "tS2Sx-WLe8DTFeAYdgd7UEN6uxrf3JlA";  // token projek gimik
-      const VPIN = "V1";
-      const BASE = "https://blr1.blynk.cloud/external/api";
+      <!-- Label Teks bawah butang -->
+      <a-entity position="0 -0.4 0"
+        text="value: Trigger; align: center; color: black; width: 3;">
+      </a-entity>
 
-      function triggerServo(){
-        fetch(`${BASE}/update?token=${BLYNK_TOKEN}&${VPIN}=1`)
-          .then(()=>alert("Servo Triggered! (V1=1 dihantar)"));
-      }
-    </script>
-  </body>
+    </a-marker>
+
+    <!-- Kamera + Cursor supaya boleh klik objek -->
+    <a-entity camera 
+              cursor="fuse: false; rayOrigin: mouse;" 
+              raycaster="objects: .clickable">
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const BLYNK_TOKEN = "tS2Sx-WLe8DTFeAYdgd7UEN6uxrf3JlA";  // token projek gimik
+    const VPIN = "V1";
+    const BASE = "https://blr1.blynk.cloud/external/api";
+
+    // cari semua objek class "clickable"
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".clickable").forEach(el => {
+        el.addEventListener("click", () => {
+          fetch(`${BASE}/update?token=${BLYNK_TOKEN}&${VPIN}=1`)
+            .then(() => alert("Servo Triggered! (V1=1 dihantar)"))
+            .catch(err => alert("Error: " + err));
+        });
+      });
+    });
+  </script>
+</body>
 </html>
