@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AR Reveal (Gimik Servo)</title>
+<!-- AFRAme + AR.js dari CDN (perlukan HTTPS utk akses kamera) -->
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.2/aframe/build/aframe-ar.min.js"></script>
+<style>
+body{margin:0;overflow:hidden;font-family:system-ui}
+.btn{position:fixed;left:50%;transform:translateX(-50%);bottom:18px;
+     padding:12px 18px;border-radius:12px;background:#111;color:#fff;border:0;font-weight:700}
+.banner{position:fixed;top:12px;left:50%;transform:translateX(-50%);
+        background:#111;color:#fff;padding:8px 12px;border-radius:10px}
+.status{position:fixed;top:52px;left:50%;transform:translateX(-50%);
+        background:#eee;color:#111;padding:6px 10px;border-radius:8px;font-size:14px}
+</style>
+</head>
+<body>
+<div class="banner">AR mode — halakan kamera ke marker “hiro” (tak wajib)</div>
+<div class="status" id="st">Status: siap</div>
+
+<!-- AR scene. Marker "hiro" opsyenal — butang tetap berfungsi walau marker tak nampak -->
+<a-scene embedded arjs="sourceType: webcam; debugUIEnabled:false;">
+  <a-marker preset="hiro">
+    <a-box position="0 0.5 0" material="opacity:0.35"></a-box>
+  </a-marker>
+  <a-entity camera></a-entity>
+</a-scene>
+
+<button class="btn" onclick="reveal()">Reveal</button>
+
+<script>
+const BLYNK_TOKEN = "tS2Sx-WLe8DTFeAYdgd7UEN6uxrf3JlA"; // token Encik
+const VPIN = "V1";
+const BASE = "https://blr1.blynk.cloud/external/api";   // region BLR1
+
+function setStatus(t){ document.getElementById('st').textContent = "Status: " + t; }
+
+async function reveal(){
+  setStatus("Menghantar arahan...");
+  try{
+    const r = await fetch(`${BASE}/update?token=${BLYNK_TOKEN}&${VPIN}=1`);
+    if(r.ok){ setStatus("Triggered! (V1=1 dihantar)"); alert("Triggered!"); }
+    else { setStatus("Gagal hantar ke Blynk"); alert("Gagal set V1"); }
+  }catch(e){
+    setStatus("Ralat: " + e); alert("Error: " + e);
+  }
+}
+</script>
+</body>
+</html>
