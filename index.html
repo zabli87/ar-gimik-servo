@@ -4,55 +4,54 @@
   <meta charset="utf-8">
   <title>Projek Gimik AR</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- A-Frame + AR.js (version pin + cache-busting) -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js?v=2"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
   <style>
-    body{margin:0;overflow:hidden}
+    html,body{margin:0;height:100%;overflow:hidden}
+    /* >>> Hentikan zoom/crop video kamera */
+    video#arjs-video {
+      width: 100vw !important;
+      height: 100vh !important;
+      object-fit: contain !important;  /* elak zoom; akan ada ruang hitam jika nisbah tak sama */
+      position: fixed !important; left:0; top:0;
+    }
   </style>
 </head>
 <body>
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled:false;">
-    <!-- Marker HIRO -->
+  <!-- Tetapkan resolusi sumber & paparan supaya nisbah 16:9 kekal -->
+  <a-scene embedded
+           arjs="sourceType: webcam; debugUIEnabled:false;
+                 sourceWidth:1280; sourceHeight:720;
+                 displayWidth:1280; displayHeight:720">
     <a-marker preset="hiro">
-      <!-- Tajuk -->
       <a-entity position="0 0.8 0"
         text="value: Projek Gimik Penutup Pertandingan Inovasi; color: red; align: center; width: 3;">
       </a-entity>
 
-      <!-- BUTANG AR: kotak hijau yang boleh di-tap -->
       <a-box class="clickable"
              position="0 0 0"
              depth="0.3" height="0.3" width="0.3"
              color="green"
-             onclick="triggerServo()">
-      </a-box>
+             onclick="triggerServo()"></a-box>
 
       <a-entity position="0 -0.4 0"
-        text="value: Trigger; align: center; color: black; width: 3;">
-      </a-entity>
+        text="value: Trigger; align: center; color: black; width: 3;"></a-entity>
     </a-marker>
 
-    <!-- Kamera + cursor/raycaster supaya tap/mouse detect objek .clickable -->
     <a-entity camera
               cursor="fuse: false; rayOrigin: mouse;"
-              raycaster="objects: .clickable">
-    </a-entity>
+              raycaster="objects: .clickable"></a-entity>
   </a-scene>
 
   <script>
-    // Blynk API (region BLR1)
     const BASE  = "https://blr1.blynk.cloud/external/api";
     const TOKEN = "tS2Sx-WLe8DTFeAYdgd7UEN6uxrf3JlA";
     const VPIN  = "V1";
-
     async function triggerServo(){
       try{
         const r = await fetch(`${BASE}/update?token=${TOKEN}&${VPIN}=1`);
         alert(r.ok ? "Triggered!" : "Gagal hantar ke Blynk");
-      }catch(e){
-        alert("Error: " + e);
-      }
+      }catch(e){ alert("Error: "+e); }
     }
   </script>
 </body>
