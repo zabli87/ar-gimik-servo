@@ -3,57 +3,57 @@
 <head>
   <meta charset="utf-8">
   <title>Projek Gimik AR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- A-Frame + AR.js (version pin + cache-busting) -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js?v=2"></script>
+  <style>
+    body{margin:0;overflow:hidden}
+  </style>
 </head>
-<body style="margin:0; overflow:hidden;">
+<body>
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled:false;">
-    
     <!-- Marker HIRO -->
     <a-marker preset="hiro">
-
-      <!-- Tajuk Projek -->
+      <!-- Tajuk -->
       <a-entity position="0 0.8 0"
-        text="value: Projek Gimik Penutup Pertandingan Inovasi; 
-              color: red; align: center; width: 3;">
+        text="value: Projek Gimik Penutup Pertandingan Inovasi; color: red; align: center; width: 3;">
       </a-entity>
 
-      <!-- Butang Trigger (Kotak Hijau) -->
+      <!-- BUTANG AR: kotak hijau yang boleh di-tap -->
       <a-box class="clickable"
              position="0 0 0"
              depth="0.3" height="0.3" width="0.3"
-             color="green">
+             color="green"
+             onclick="triggerServo()">
       </a-box>
 
-      <!-- Label Teks bawah butang -->
       <a-entity position="0 -0.4 0"
         text="value: Trigger; align: center; color: black; width: 3;">
       </a-entity>
-
     </a-marker>
 
-    <!-- Kamera + Cursor supaya boleh klik objek -->
-    <a-entity camera 
-              cursor="fuse: false; rayOrigin: mouse;" 
+    <!-- Kamera + cursor/raycaster supaya tap/mouse detect objek .clickable -->
+    <a-entity camera
+              cursor="fuse: false; rayOrigin: mouse;"
               raycaster="objects: .clickable">
     </a-entity>
   </a-scene>
 
   <script>
-    const BLYNK_TOKEN = "tS2Sx-WLe8DTFeAYdgd7UEN6uxrf3JlA";  // token projek gimik
-    const VPIN = "V1";
-    const BASE = "https://blr1.blynk.cloud/external/api";
+    // Blynk API (region BLR1)
+    const BASE  = "https://blr1.blynk.cloud/external/api";
+    const TOKEN = "tS2Sx-WLe8DTFeAYdgd7UEN6uxrf3JlA";
+    const VPIN  = "V1";
 
-    // cari semua objek class "clickable"
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll(".clickable").forEach(el => {
-        el.addEventListener("click", () => {
-          fetch(`${BASE}/update?token=${BLYNK_TOKEN}&${VPIN}=1`)
-            .then(() => alert("Servo Triggered! (V1=1 dihantar)"))
-            .catch(err => alert("Error: " + err));
-        });
-      });
-    });
+    async function triggerServo(){
+      try{
+        const r = await fetch(`${BASE}/update?token=${TOKEN}&${VPIN}=1`);
+        alert(r.ok ? "Triggered!" : "Gagal hantar ke Blynk");
+      }catch(e){
+        alert("Error: " + e);
+      }
+    }
   </script>
 </body>
 </html>
